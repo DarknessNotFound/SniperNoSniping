@@ -35,5 +35,5 @@ class Snipe_Commands(commands.Cog):
 		await ctx.send(SniperMessage(sniper, sniped, timestamp))
 
 
-def setup(client):
-	client.add_cog(Snipe_Commands(client))
+async def setup(client):
+	await client.add_cog(Snipe_Commands(client))

@@ -6,7 +6,7 @@ import random
 import discord
 
 # Needed for lists of members
-intents = discord.Intents.default()
+intents = discord.Intents.all()
 intents.members = True
 
 from dotenv import load_dotenv
@@ -44,8 +44,14 @@ async def reload(ctx, extension):
     bot.load_extension(f'cogs.{extension}')
     
 # This searches for all cogs in the cog file and loads the functions for use
-for filename in os.listdir('./cogs'):
-    if filename.endswith('.py'):
-        bot.load_extension(f'cogs.{filename[:-3]}')
+async def load_extensions():
+    for filename in os.listdir('./cogs'):
+        if filename.endswith('.py'):
+            await bot.load_extension(f'cogs.{filename[:-3]}')
+
+async def main():
+    async with bot:
+        await load_extensions()
+        await bot.start(TOKEN)
         
-bot.run(TOKEN)
+asyncio.run(main())
