@@ -12,12 +12,16 @@ def GetPlayersTableName():
 def GetPlayerNameVarientTableName():
 	return "PlayerNameVarients"
 
+def GetTempSnipesTableName():
+	return "TempSnipes"
+
 def SetupDB():
 	try:
 		Conn = sqlite3.connect(GetDbName())
 		
 		SnipesT = GetSnipesTableName()
 		PlayerT = GetPlayersTableName()
+		TempSnipesT = GetTempSnipesTableName()
 		NameVarientT = GetPlayerNameVarientTableName()	
 		
 		# For each table: Check if table exists, if not, then create the table
@@ -45,13 +49,21 @@ def SetupDB():
 					Id INTEGER PRIMARY KEY AUTOINCREMENT,
 					Sniper INTEGER NOT NULL,
 					Sniped INTEGER NOT NULL,
-					timestamp DATETIME NOT NULL,
+					Timestamp DATETIME NOT NULL,
 					IsDeleted INT2,
 					FOREIGN KEY(Sniper) REFERENCES {1}(Id),
 					FOREIGN KEY(Sniped) REFERENCES {1}(Id)
 				)""".format(SnipesT, PlayerT))
 			print("{0} table created.".format(SnipesT))
-
+		
+		if(TableExistsInDb(Conn, TempSnipesT) == False):
+			Conn.execute("""
+				CREATE TABLE {0}(
+					Id INTEGER PRIMARY KEY AUTOINCREMENT,
+					Sniper TEXT,
+					Sniped TEXT,
+					Timestamp DATETIME NOT NULL
+			)""".format(TempSnipesT)) 
 	except Exception as e:
 		print("DB_Creation.py -- SetupDB -- {}".format(e))
 
