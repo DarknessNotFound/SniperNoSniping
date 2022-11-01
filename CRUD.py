@@ -11,5 +11,4 @@ def AddTempSnipe(Sniper, Sniped):
 			print("CRUD.py -- AddTempSnipe -- TempSnipesTable doesn't exist")
 			return
 
-		Conn = sqlite3.execute(
 		
