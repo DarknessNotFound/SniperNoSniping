@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
 from funcs import accessible_channel
-from SniperFuncs import *
 from datetime import datetime
 from CRUD import *
 
@@ -53,6 +52,7 @@ class SnipeTemp_Commands(commands.Cog):
 
     @commands.command(name='SnipingSeason', help='Shows an announcement for the start of sniping season')
     async def SnipingSeason(self, ctx, *args):
+        print("Started Sniping Season")
         if ctx.author.name != 'GmanBeCrazy':
             await ctx.send("This command is too powerful for you to use!")
             return
