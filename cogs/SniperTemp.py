@@ -3,6 +3,7 @@ from discord.ext import commands
 from funcs import accessible_channel
 from SniperFuncs import *
 from datetime import datetime
+from CRUD import *
 
 class SnipeTemp_Commands(commands.Cog):
 	def __init__(self, client):
@@ -25,7 +26,7 @@ class SnipeTemp_Commands(commands.Cog):
 		timestamp = datetime.now()
 
 		#Add the sniped to the database and send confirmation message
-		AddSnipeRecord(sniper, sniped, timestamp)
+		AddTempSnipe(sniper, sniped, timestamp)
 		await ctx.send(SniperMessage(sniper, sniped, timestamp))
 
 async def setup(client):
