@@ -1,7 +1,7 @@
 import sqlite3
 
 def GetDbName():
-    return "SniperNoSnipingDB"
+    return "PRODSniperNoSnipingDB"
 
 def GetSnipesTableName():
     return "Snipes"

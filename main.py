@@ -28,7 +28,7 @@ bot = commands.Bot(command_prefix='>>', intents=intents)
 
 @bot.event
 async def on_ready():
-    print("Connected successfully!")
+    print(f"Connected successfully in PROD!")
     
 @bot.command()
 async def load(ctx, extension):

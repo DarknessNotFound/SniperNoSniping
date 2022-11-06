@@ -26,3 +26,25 @@ def AddTempSnipe(Sniper, Sniped, Timestamp):
     finally:
         Conn.close()
         return result
+
+def RemoveSnipe(Id):
+    try:
+        Conn = sqlite3.connect(GetDbName())
+        Cur = Conn.cursor()
+        TempSnipesTable = GetTempSnipesTableName()
+
+        if(TableExistsInDb(Conn, TempSnipesTable, False) == False):
+            print("CRUD.py -- RemoveSnipe -- TempSnipesTable doesn't exist")
+            return
+
+        sql = f"""DELETE FROM {TempSnipesTable}
+                  WHERE Id = {Id};"""
+
+        Cur.execute(sql)
+        Conn.commit()
+        print("RemoveSnipe executed")
+    except:
+        print(f"CRUD -- AddTempSnipe -- {ex}")
+
+    finally:
+        Conn.close()

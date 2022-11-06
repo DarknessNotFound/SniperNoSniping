@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
 from funcs import accessible_channel
-from SniperFuncs import *
 from datetime import datetime
 from CRUD import *
 
@@ -24,7 +23,6 @@ class SnipeTemp_Commands(commands.Cog):
 
         #Get the time
         timestamp = datetime.now()
-
         #Add the sniped to the database and send confirmation message
         if(AddTempSnipe(sniper, sniped, timestamp) == True):
             await ctx.send(f"{sniper} sniped {sniped}  successfully at {timestamp}!")
@@ -33,6 +31,7 @@ class SnipeTemp_Commands(commands.Cog):
 
     @commands.command(name='AllSnipes', help='Shows all of the snipes in the database')
     async def AllSnipes(self, ctx, *args):
+        print("AllSnipes executed")
         #Guard clause against wrong channel.
         if accessible_channel(ctx) == False:
             await ctx.send("Please send commands in the Sniper bot channel!")
@@ -50,14 +49,72 @@ class SnipeTemp_Commands(commands.Cog):
             print(f"SnipeTemp_Commands -- AllSnipes -- {ex}")
         finally:
             Conn.close()
+            print("AllSnipes finished execution")
+
+    @commands.command(name='AllSnipers', help='Gets all the names of all the snipers')
+    async def AllSnipers(self, ctx, *args):
+        print("AllSnipers executed")
+        try:
+            Conn = sqlite3.connect(GetDbName())
+            Cur = Conn.cursor()
+            data = Cur.execute(f"SELECT DISTINCT Sniper FROM TempSnipes")
+
+            if data is None:
+               ctx.send("No snipers in database found")
+
+            for row in data:
+                await ctx.send(row)
+        except Exception as ex:
+            print(f"SnipeTemp_Commands -- AllSnipes -- {ex}")
+        finally:
+            Conn.close()
+            print("AllSnipers finished execution")
+
+    @commands.command(name='SnipesFrom', help='Gets all of the snipes from a single player')
+    async def SnipesFrom(self, ctx, *args):
+        print("SnipesFrom executed")
+        try:
+            Conn = sqlite3.connect(GetDbName())
+            Cur = Conn.cursor()
+            data = Cur.execute(f"SELECT * FROM TempSnipes WHERE Sniper = '{' '.join(args)}'")
+
+            if data is None:
+                ctx.send("That sniper has not made any snipes. You might have also misspelled the name, use >>AllSnipers.")
+
+            for row in data:
+                await ctx.send(row)
+        except Exception as ex:
+            print(f"SnipeTemp_Commands -- SnipesFrom -- {ex}")
+        finally:
+            Conn.close()
+            print("SnipesFrom finished execution")
+
+    @commands.command(name='Remove', help='Removes a snipe based on the Id inputed')
+    async def Remove(self, ctx, *args):
+        print("Removal executed")
+        if ctx.author.name != 'GmanBeCrazy' and ctx.author.name != 'Imladris':
+            print("You don't have access to that command")
+            return
+        RemoveSnipe(''.join(args))
+
 
     @commands.command(name='SnipingSeason', help='Shows an announcement for the start of sniping season')
     async def SnipingSeason(self, ctx, *args):
-        if ctx.author.name != 'GmanBeCrazy':
+        print("Started Sniping Season")
+        # if ctx.author.name != 'GmanBeCrazy':
+        if False:
             await ctx.send("This command is too powerful for you to use!")
             return
-
-        await ctx.send("""Swiper no swiping, Swiper no swiping, Swiper... Well I'm sick and tired of this stupid little kid being able to stop me from doing what I want. Dora wanted an adventure and I want to show her the true dangers of adventuring. Say, why don't you help me? I need someone to snipe her before she can say those magic words. Try outs begin now and last throughout November, the person who gets the most snipes I will give a prize to. The person who gets sniped the most will be given compensation so you don't sue me. Anyways, just type '>>snipe @Person' alongside the picture to snipe them and I will tell you if it counted or not. Please try to keep the naming using discords @'s if possible or use the persons real name to make it easier on my judges. Anyways, read the rules that are pinned and enjoy sniping. I can't wait those meddling kid and her stupid monkey... wait wrong show...""")
+        embed=discord.Embed(
+                title="Swiper no swiping, Swiper no swiping, Swiper...",
+                description="I'm sick and tired of this *stupid little brat* being able to stop **me** from doing what I want. Dora wanted an adventure and I intend to give her one.",
+                color=discord.Color.green())
+        embed.add_field(name="I need help", value="I need someone to take out this Dora, someone who can finish her quickly, quietly, and with a bang. She won't even have time to say Sniper No Sniping.", inline=False)
+        embed.add_field(name="Try outs begin now", value="You have from now through November to impress me and my panel of judges. Use the `>>snipe @Person` and post the picture to let my judges know when you get someone.")
+        embed.add_field(name="Payment", value="I will give a prize to the one who has the most snipes and a compensation to the one who got sniped the most.")
+        embed.add_field(name="Happy Hunting", value="Dora's next adventure will *clear* her head.", inline=False)
+        embed.set_footer(text="NOTE: if the person isn't in the discord but is a legal snipe, use their first and last name to help the moderators count snipes at the end of the season.")
+        await ctx.send(embed=embed)
 
 async def setup(client):
     await client.add_cog(SnipeTemp_Commands(client))
