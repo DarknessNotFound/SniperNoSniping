@@ -63,7 +63,13 @@ class SnipeTemp_Commands(commands.Cog):
                ctx.send("No snipers in database found")
 
             for row in data:
-                await ctx.send(row)
+                msg = f"{row[0]} -- Snipes: "
+                Cur = Conn.cursor()
+                SnipeNum = Cur.execute(f"SELECT COUNT(*) FROM TempSnipes WHERE Sniper = '{row[0]}'")
+                for count in SnipeNum:
+                    msg += f"{count[0]} "
+                await ctx.send(msg)
+
         except Exception as ex:
             print(f"SnipeTemp_Commands -- AllSnipes -- {ex}")
         finally:
@@ -97,6 +103,27 @@ class SnipeTemp_Commands(commands.Cog):
             return
         RemoveSnipe(''.join(args))
 
+    @commands.command(name='AllSniped', help='Gets all of the people who have been sniped')
+    async def AllSniped(self, ctx, *args):
+        try:
+            Conn = sqlite3.connect(GetDbName())
+            Cur = Conn.cursor()
+            data = Cur.execute(f"SELECT DISTINCT Sniped FROM TempSnipes")
+
+            if data is None:
+                ctx.send("No snipes found")
+
+            for row in data:
+                msg = f"{row[0]} -- Sniped: "
+                Cur = Conn.cursor()
+                SnipeNum = Cur.execute(f"SELECT COUNT(*) FROM TempSnipes WHERE Sniped = '{row[0]}'")
+                for count in SnipeNum:
+                    msg += f"{count[0]} "
+                await ctx.send(msg)
+        except Exception as ex:
+            print(f"SnipeTemp_Commands -- SnipesFrom -- {ex}")
+        finally:
+            Conn.close()
 
     @commands.command(name='SnipingSeason', help='Shows an announcement for the start of sniping season')
     async def SnipingSeason(self, ctx, *args):
