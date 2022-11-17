@@ -43,8 +43,34 @@ def RemoveSnipe(Id):
         Cur.execute(sql)
         Conn.commit()
         print("RemoveSnipe executed")
-    except:
+    except Exception as ex:
         print(f"CRUD -- AddTempSnipe -- {ex}")
+
+    finally:
+        Conn.close()
+
+def UpdateSnipedSQL(Id, NewName):
+    print(f"Attempting to update {Id} to Sniped = {NewName}")
+    try:
+        Conn = sqlite3.connect(GetDbName())
+        Cur = Conn.cursor()
+        TempSnipesTable = GetTempSnipesTableName()
+
+        if(TableExistsInDb(Conn, TempSnipesTable, False) == False):
+            print("CRUD.py -- RemoveSnipe -- TempSnipesTable doesn't exist")
+            return
+
+        sql = f"""
+                UPDATE {TempSnipesTable}
+                SET Sniped = '{NewName}'
+                WHERE Id = '{Id}';
+            """
+
+        Cur.execute(sql)
+        Conn.commit()
+        print("RemoveSnipe executed")
+    except Exception as ex:
+        print(f"CRUD -- UpdateSnipe -- {ex}")
 
     finally:
         Conn.close()

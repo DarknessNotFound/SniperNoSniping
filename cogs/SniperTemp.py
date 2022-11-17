@@ -29,18 +29,54 @@ class SnipeTemp_Commands(commands.Cog):
         else:
             await ctx.send(f"{sniper} sniping {sniped} failed to add to database... please try again")
 
-    @commands.command(name='AllSnipes', help='Shows all of the snipes in the database')
+    @commands.command(name='AllSnipes', help='Shows all of the snipes in the database. Can do ">>AllSnipes today" to show todays snipes. Can add a number as an argument to show snipes from x days ago: ">>AllSnipes x".')
     async def AllSnipes(self, ctx, *args):
         print("AllSnipes executed")
-        #Guard clause against wrong channel.
-        if accessible_channel(ctx) == False:
-            await ctx.send("Please send commands in the Sniper bot channel!")
-            return
 
         try:
             Conn = sqlite3.connect(GetDbName())
             Cur = Conn.cursor()
-            data = Cur.execute("SELECT * FROM TempSnipes")
+
+            if(len(args) == 0):
+                data = Cur.execute("SELECT * FROM TempSnipes;")
+            elif(len(args) == 1):
+                if(args[0].lower() == "today"):
+                    data = Cur.execute("SELECT * FROM TempSnipes WHERE Timestamp > DATE('now', 'localtime');")
+                else:
+                    if(len(args[0]) <= 2):
+                        data = Cur.execute(f"""
+                                            SELECT * 
+                                            FROM TempSnipes 
+                                            WHERE Timestamp > DATE('now', 'localtime', '-{args[0]} day')
+                                            AND Timestamp < DATE('now', 'localtime', '-{int(args[0]) - 1} day');
+                                        """)
+                    else:
+                        await ctx.send("Arguments not understood or too many args, sending snipes from today instead...")
+                        data = Cur.execute("SELECT * FROM TempSnipes WHERE Timestamp > DATE('now', 'localtime');")                        
+            else:
+                await ctx.send("Arguments not understood or too many args, sending snipes from today instead...")
+                data = Cur.execute("SELECT * FROM TempSnipes WHERE Timestamp > DATE('now', 'localtime');")
+
+            await ctx.send("Format: (Id, Sniper, Sniped, Timestamp)")
+            if(data.rowcount <= 0):
+                await ctx.send("No data found...")
+
+            for row in data:
+                await ctx.send(row)
+        except Exception as ex:
+            print(f"SnipeTemp_Commands -- AllSnipes -- {ex}")
+        finally:
+            Conn.close()
+            print("AllSnipes finished execution")
+
+    @commands.command(name='SnipesToday', help='Shows all of the snipes from today.')
+    async def SnipesToday(self, ctx, *args):
+        print("SnipesToday executed")
+
+        try:
+            Conn = sqlite3.connect(GetDbName())
+            Cur = Conn.cursor()
+            data = Cur.execute("SELECT * FROM TempSnipes WHERE Timestamp > DATE('now', 'localtime')")
             
             await ctx.send("Format: (Id, Sniper, Sniped, Timestamp)")
             for row in data:
@@ -49,7 +85,7 @@ class SnipeTemp_Commands(commands.Cog):
             print(f"SnipeTemp_Commands -- AllSnipes -- {ex}")
         finally:
             Conn.close()
-            print("AllSnipes finished execution")
+            print("SnipesToday finished execution")
 
     @commands.command(name='AllSnipers', help='Gets all the names of all the snipers')
     async def AllSnipers(self, ctx, *args):
@@ -95,13 +131,24 @@ class SnipeTemp_Commands(commands.Cog):
             Conn.close()
             print("SnipesFrom finished execution")
 
-    @commands.command(name='Remove', help='Removes a snipe based on the Id inputed')
-    async def Remove(self, ctx, *args):
-        print("Removal executed")
-        if ctx.author.name != 'GmanBeCrazy' and ctx.author.name != 'Imladris':
-            await ctx.send("You don't have access to that command")
-            return
-        RemoveSnipe(''.join(args))
+    @commands.command(name='SnipeId', help='Gets snipe information based on id number.')
+    async def SnipeId(self, ctx, *args):
+        print("SnipeId executed")
+        try:
+            Conn = sqlite3.connect(GetDbName())
+            Cur = Conn.cursor()
+            data = Cur.execute(f"SELECT * FROM TempSnipes WHERE Id = '{' '.join(args)}'")
+
+            if data is None:
+                ctx.send(f"That snipe id '{' '.join(args)}' is invalid.")
+
+            for row in data:
+                await ctx.send(row)
+        except Exception as ex:
+            print(f"SnipeTemp_Commands -- SnipeId -- {ex}")
+        finally:
+            Conn.close()
+            print("SnipeId finished execution")
 
     @commands.command(name='AllSniped', help='Gets all of the people who have been sniped')
     async def AllSniped(self, ctx, *args):
