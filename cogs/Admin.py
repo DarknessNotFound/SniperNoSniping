@@ -4,10 +4,6 @@ from funcs import accessible_channel
 from datetime import datetime
 from CRUD import *
 
-def IsAdmin(Name: str) -> bool:
-    Admin = ["GmanBeCrazy", "Imladris"]
-    return Name in Admin
-
 class SnipeAdmin_Commands(commands.Cog):
     def __init__(self, client):
         self.client = client

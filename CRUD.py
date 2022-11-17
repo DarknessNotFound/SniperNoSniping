@@ -2,6 +2,10 @@ from DB_Creation import *
 
 TempSnipesTable = GetTempSnipesTableName()
 
+def IsAdmin(Name: str) -> bool:
+    Admin = ["GmanBeCrazy", "Imladris"]
+    return Name in Admin
+
 def AddTempSnipe(Sniper, Sniped, Timestamp):
     result = False
     try:

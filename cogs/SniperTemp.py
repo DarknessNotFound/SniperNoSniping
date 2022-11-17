@@ -10,11 +10,6 @@ class SnipeTemp_Commands(commands.Cog):
     # Commands
     @commands.command(name='snipe', help='Adds a snipe to the database')
     async def snipe(self, ctx, *args):
-        #Guard clause against wrong channel.
-        if accessible_channel(ctx) == False:
-            await ctx.send("Please send commands in the Sniper bot channel!")
-            return
-
         #Get who sent the message
         sniper = ctx.author.name
         
@@ -32,6 +27,10 @@ class SnipeTemp_Commands(commands.Cog):
     @commands.command(name='AllSnipes', help='Shows all of the snipes in the database. Can do ">>AllSnipes today" to show todays snipes. Can add a number as an argument to show snipes from x days ago: ">>AllSnipes x".')
     async def AllSnipes(self, ctx, *args):
         print("AllSnipes executed")
+
+        if IsAdmin(ctx.author.name) == False:
+            await ctx.send("You don't have access to that command")
+            return
 
         try:
             Conn = sqlite3.connect(GetDbName())
@@ -87,9 +86,31 @@ class SnipeTemp_Commands(commands.Cog):
             Conn.close()
             print("SnipesToday finished execution")
 
+    @commands.command(name='AmountOfSnipes', help='Shows the total number of snipes in the database.')
+    async def AmountOfSnipes(self, ctx, *args):
+        print("AmountOfSnipes executed")
+        try:
+            Conn = sqlite3.connect(GetDbName())
+            Cur = Conn.cursor()
+
+            data = Cur.execute("SELECT * FROM TempSnipes;")
+
+            await ctx.send(f"Snipes this season: {data.rowcount}")
+
+        except Exception as ex:
+            print(f"SnipeTemp_Commands -- AmountOfSnipes -- {ex}")
+        finally:
+            Conn.close()
+            print("AmountOfSnipes finished execution")
+
     @commands.command(name='AllSnipers', help='Gets all the names of all the snipers')
     async def AllSnipers(self, ctx, *args):
         print("AllSnipers executed")
+
+        if IsAdmin(ctx.author.name) == False:
+            await ctx.send("You don't have access to that command")
+            return
+
         try:
             Conn = sqlite3.connect(GetDbName())
             Cur = Conn.cursor()
@@ -115,6 +136,11 @@ class SnipeTemp_Commands(commands.Cog):
     @commands.command(name='SnipesFrom', help='Gets all of the snipes from a single player')
     async def SnipesFrom(self, ctx, *args):
         print("SnipesFrom executed")
+
+        if IsAdmin(ctx.author.name) == False:
+            await ctx.send("You don't have access to that command")
+            return
+
         try:
             Conn = sqlite3.connect(GetDbName())
             Cur = Conn.cursor()
@@ -152,6 +178,10 @@ class SnipeTemp_Commands(commands.Cog):
 
     @commands.command(name='AllSniped', help='Gets all of the people who have been sniped')
     async def AllSniped(self, ctx, *args):
+        if IsAdmin(ctx.author.name) == False:
+            await ctx.send("You don't have access to that command")
+            return
+
         try:
             Conn = sqlite3.connect(GetDbName())
             Cur = Conn.cursor()
@@ -175,10 +205,11 @@ class SnipeTemp_Commands(commands.Cog):
     @commands.command(name='SnipingSeason', help='Shows an announcement for the start of sniping season')
     async def SnipingSeason(self, ctx, *args):
         print("Started Sniping Season")
-        # if ctx.author.name != 'GmanBeCrazy':
-        if False:
-            await ctx.send("This command is too powerful for you to use!")
+
+        if IsAdmin(ctx.author.name) == False:
+            await ctx.send("You don't have access to that command")
             return
+        
         embed=discord.Embed(
                 title="Swiper no swiping, Swiper no swiping, Swiper...",
                 description="I'm sick and tired of this *stupid little brat* being able to stop **me** from doing what I want. Dora wanted an adventure and I intend to give her one.",
