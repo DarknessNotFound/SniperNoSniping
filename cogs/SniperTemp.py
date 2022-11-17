@@ -95,7 +95,7 @@ class SnipeTemp_Commands(commands.Cog):
 
             data = Cur.execute("SELECT * FROM TempSnipes;")
 
-            await ctx.send(f"Snipes this season: {data.rowcount}")
+            await ctx.send(f"Snipes this season: {len(data)}")
 
         except Exception as ex:
             print(f"SnipeTemp_Commands -- AmountOfSnipes -- {ex}")
