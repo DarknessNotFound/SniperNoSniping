@@ -99,7 +99,7 @@ class SnipeTemp_Commands(commands.Cog):
     async def Remove(self, ctx, *args):
         print("Removal executed")
         if ctx.author.name != 'GmanBeCrazy' and ctx.author.name != 'Imladris':
-            print("You don't have access to that command")
+            await ctx.send("You don't have access to that command")
             return
         RemoveSnipe(''.join(args))
 
