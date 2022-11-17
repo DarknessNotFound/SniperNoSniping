@@ -93,9 +93,10 @@ class SnipeTemp_Commands(commands.Cog):
             Conn = sqlite3.connect(GetDbName())
             Cur = Conn.cursor()
 
-            data = Cur.execute("SELECT * FROM TempSnipes;")
+            data = Cur.execute("SELECT COUNT() FROM TempSnipes AS Amount;")
 
-            await ctx.send(f"Snipes this season: {len(data)}")
+            for row in data:
+                await ctx.send(f"Snipes this season: {row[0]}")
 
         except Exception as ex:
             print(f"SnipeTemp_Commands -- AmountOfSnipes -- {ex}")
